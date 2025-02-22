@@ -4,12 +4,19 @@ RadixSortState rState;
 
 void setup() {
   size(1900, 400);
-  initializeArray(150); // Start with 150 elements
+  initializeArray(2); // Start with 150 elements
+  surface.setResizable(true);
+  frameRate(600);
 }
 
 void draw() {
   background(255);
   barDraw();
+  
+  // Display the number of bars at the top left
+  fill(0);
+  textSize(16);
+  text("Number of bars: " + values.length, 10, 20);
   
   if (sorting) {
     radixSortStep();
@@ -20,10 +27,7 @@ void draw() {
 void barDraw() {
   int barWidth = max(1, width / values.length);
   for (int i = 0; i < values.length; i++) {
-    // Highlight the element currently being processed in red.
     if (rState != null) {
-      // For phases 0, 1, and 3, highlight the bar at countIndex.
-      // For phase 2, highlight the bar at placeIndex.
       if ((rState.phase == 0 || rState.phase == 1 || rState.phase == 3) && i == rState.countIndex) {
         fill(255, 0, 0);
       } else if (rState.phase == 2 && i == rState.placeIndex) {
@@ -48,7 +52,6 @@ void radixSortStep() {
   
   rState.step();
   
-  // When the radix sort is finished, update the values and restart after a pause.
   if (rState.done) {
     values = rState.values;
     sorting = false;
@@ -98,14 +101,12 @@ class RadixSortState {
   
   // Processes one small step of the current phase per frame.
   void step() {
-    // If all digits have been processed, mark as done.
     if (exp > maxVal) {
       done = true;
       return;
     }
     
     if (phase == 0) {
-      // Phase 0: Count the frequency of each digit for the current exponent.
       if (countIndex < values.length) {
         int digit = (values[countIndex] / exp) % 10;
         count[digit]++;
@@ -115,7 +116,6 @@ class RadixSortState {
         countIndex = 0;
       }
     } else if (phase == 1) {
-      // Phase 1: Transform the count array to cumulative counts.
       if (countIndex < 9) {
         count[countIndex + 1] += count[countIndex];
         countIndex++;
@@ -124,7 +124,6 @@ class RadixSortState {
         placeIndex = values.length - 1;
       }
     } else if (phase == 2) {
-      // Phase 2: Build the output array by placing each element in its correct position.
       if (placeIndex >= 0) {
         int digit = (values[placeIndex] / exp) % 10;
         output[count[digit] - 1] = values[placeIndex];
@@ -135,12 +134,10 @@ class RadixSortState {
         countIndex = 0;
       }
     } else if (phase == 3) {
-      // Phase 3: Copy the sorted output array back into the values array.
       if (countIndex < values.length) {
         values[countIndex] = output[countIndex];
         countIndex++;
       } else {
-        // Completed processing one digit; prepare for the next pass.
         exp *= 10;
         phase = 0;
         countIndex = 0;
