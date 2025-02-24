@@ -1,17 +1,30 @@
 int[] values;
 boolean sorting = false;
 RadixSortState rState;
+float avg;
+float lasts = 0;
 
 void setup() {
   size(1900, 400);
   initializeArray(2); // Start with 150 elements
   surface.setResizable(true);
-  frameRate(600);
+  frameRate(10000);
+  noSmooth(); // Disable smoothing to potentially increase frame rate
 }
 
 void draw() {
+  float s = second();
   background(255);
   barDraw();
+  print(frameCount);
+  print("\n");
+  if (s == 0) {
+    s = lasts;
+  }
+  avg = (frameCount)/s;
+  lasts = s;
+  print(avg);
+  print("\n");
   
   // Display the number of bars at the top left
   fill(0);
