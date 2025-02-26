@@ -16,13 +16,13 @@ void setup() {
 void draw() {
   background(255);
   visualizer.barDraw();
-  
+
   // Display the number of bars at the top left
   fill(0);
   textSize(16);
   text("Code of Eliott HALL.", 10, 40);
   text("Number of bars: " + (visualizer.bars.length * visualizer.bars[0].length), 10, 20);
-  
+
   if (sorting) {
     visualizer.radixSortStep();
   }
@@ -40,12 +40,12 @@ int factorial(int n) {
 class Complex {
   float real;
   float imag;
-  
+
   Complex(float real, float imag) {
     this.real = real;
     this.imag = imag;
   }
-  
+
   float magnitude() {
     return sqrt(real * real + imag * imag);
   }
@@ -55,7 +55,7 @@ class Bar {
   Complex value;
   color col;
   int row, colIndex;
-  
+
   Bar(Complex value, color col, int row, int colIndex) {
     this.value = value;
     this.col = col;
@@ -125,24 +125,24 @@ class Visualizer {
 
   void radixSortStep() {
     if (rState == null) {
-        rState = new RadixSortState(bars);
+      rState = new RadixSortState(bars);
     }
 
     rState.step();
 
     if (rState.done) {
-        bars = rState.bars;
-        sorting = false;
-        delay(1000);
+      bars = rState.bars;
+      sorting = false;
+      delay(1000);
 
-        // Only increase one of the dimensions at a time
-        if (bars.length < bars[0].length) {
-            initializeArray(bars.length * 2, bars[0].length);  // Grow rows first
-        } else {
-            initializeArray(bars.length, bars[0].length * 2);  // Then grow columns
-        }
+      // Only increase one of the dimensions at a time
+      if (bars.length < bars[0].length) {
+        initializeArray(bars.length * 2, bars[0].length);  // Grow rows first
+      } else {
+        initializeArray(bars.length, bars[0].length * 2);  // Then grow columns
+      }
 
-        rState = null;
+      rState = null;
     }
   }
 }
@@ -159,7 +159,7 @@ class RadixSortState {
   Bar[][] output;  // Temporary array to hold sorted order for the current digit
   float maxVal;    // Maximum value in the array (to determine when sorting is done)
   boolean done;    // Flag indicating if sorting is complete
-  
+
   RadixSortState(Bar[][] arr) {
     bars = arr;
     maxVal = 0;
@@ -178,13 +178,13 @@ class RadixSortState {
     output = new Bar[newRows][newCols];
     done = false;
   }
-  
+
   void step() {
     if (exp > maxVal) {
       done = true;
       return;
     }
-    
+
     if (phase == 0) {
       // Counting frequency of digits
       if (countIndex < bars.length * bars[0].length) {
