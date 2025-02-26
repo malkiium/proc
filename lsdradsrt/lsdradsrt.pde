@@ -2,20 +2,19 @@ int rows = 2; // Number of rows
 int cols = 2; // Number of columns
 boolean sorting = false;
 RadixSortState rState;
-Visualizer visualizer;
-int topMargin = 20; // Margin at the top to prevent bars from going out of the screen
 
 void setup() {
   size(1900, 400);
   visualizer = new Visualizer();
   visualizer.initializeArray(rows, cols); // Initialize with 2x2 elements
   surface.setResizable(true);
-  frameRate(60);
+  frameRate(600);
 }
 
 void draw() {
+  float s = second();
   background(255);
-  visualizer.barDraw();
+  barDraw();
   
   // Display the number of bars at the top left
   fill(0);
