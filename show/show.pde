@@ -4,7 +4,7 @@ int speedx = 10;
 int speedy = 10;
 
 void setup() {
-    size(1600, 900);
+    size(1800, 900);
 }
 
 void draw() {
