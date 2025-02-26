@@ -2,23 +2,25 @@ int rows = 2; // Number of rows
 int cols = 2; // Number of columns
 boolean sorting = false;
 RadixSortState rState;
+Visualizer visualizer;
+int topMargin = 20; // Margin at the top to prevent bars from going out of the screen
 
 void setup() {
   size(1900, 400);
   visualizer = new Visualizer();
   visualizer.initializeArray(rows, cols); // Initialize with 2x2 elements
   surface.setResizable(true);
-  frameRate(600);
+  frameRate(60);
 }
 
 void draw() {
-  float s = second();
   background(255);
-  barDraw();
+  visualizer.barDraw();
   
   // Display the number of bars at the top left
   fill(0);
   textSize(16);
+  text("Code of Eliott HALL.", 10, 40);
   text("Number of bars: " + (visualizer.bars.length * visualizer.bars[0].length), 10, 20);
   
   if (sorting) {
