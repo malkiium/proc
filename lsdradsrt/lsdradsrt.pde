@@ -10,7 +10,7 @@ void setup() {
   visualizer = new Visualizer();
   visualizer.initializeArray(rows, cols); // Initialize with 2x2 elements
   surface.setResizable(true);
-  frameRate(60);
+  frameRate(600);
 }
 
 void draw() {
@@ -66,46 +66,62 @@ class Bar {
 
 class Visualizer {
   Bar[][] bars;
-  
+  float initialMaxMagnitude;
+
+  void initializeArray(int newRows, int newCols) {
+    // Prevent excessive growth or invalid sizes
+    if (newRows < 1) newRows = 1;
+    if (newCols < 1) newCols = 1;
+
+    bars = new Bar[newRows][];  // Initialize row array first
+    for (int i = 0; i < newRows; i++) {
+      bars[i] = new Bar[newCols];  // Initialize column array
+      for (int j = 0; j < newCols; j++) {
+        bars[i][j] = new Bar(new Complex(random(0, 101), random(0, 101)), color(0, 0, 255), i, j);
+      }
+    }
+
+    // Calculate the initial maximum magnitude
+    initialMaxMagnitude = 0;
+    for (int i = 0; i < bars.length; i++) {
+      for (int j = 0; j < bars[i].length; j++) {
+        initialMaxMagnitude = max(initialMaxMagnitude, bars[i][j].value.magnitude());
+      }
+    }
+
+    sorting = true;
+    rState = null;
+  }
+
   void barDraw() {
     int minBarWidth = 1; // Minimum bar width (adjust as needed)
     int barWidth = max(minBarWidth, width / (bars.length * bars[0].length));
 
-    float maxMagnitude = 0;
-    
-    // Find the maximum magnitude to scale the bars properly
     for (int i = 0; i < bars.length; i++) {
-        for (int j = 0; j < bars[i].length; j++) {
-            maxMagnitude = max(maxMagnitude, bars[i][j].value.magnitude());
+      for (int j = 0; j < bars[i].length; j++) {
+        Bar bar = bars[i][j];
+
+        if (rState != null) {
+          if ((rState.phase == 0 || rState.phase == 1 || rState.phase == 3) && i == rState.countIndex) {
+            bar.col = color(255, 0, 0); // Highlight the current bar being processed
+          } else if (rState.phase == 2 && i == rState.placeIndex) {
+            bar.col = color(255, 0, 0); // Highlight the bar being placed
+          } else {
+            bar.col = color(0, 0, 255); // Default color for bars
+          }
+        } else {
+          bar.col = color(0, 0, 255); // Default color for bars
         }
+
+        // Adjust bar height based on the initial maximum magnitude
+        int barHeight = int(map(bar.value.magnitude(), 0, initialMaxMagnitude, 0, height - topMargin));
+        barHeight = constrain(barHeight, 5, height - topMargin); // Ensure a minimum height and fit in screen
+
+        fill(bar.col);
+        rect((i * bars[i].length + j) * barWidth, height - barHeight, barWidth - 2, barHeight);
+      }
     }
-
-    for (int i = 0; i < bars.length; i++) {
-        for (int j = 0; j < bars[i].length; j++) {
-            Bar bar = bars[i][j];
-
-            if (rState != null) {
-                if ((rState.phase == 0 || rState.phase == 1 || rState.phase == 3) && i == rState.countIndex) {
-                    bar.col = color(255, 0, 0); // Highlight the current bar being processed
-                } else if (rState.phase == 2 && i == rState.placeIndex) {
-                    bar.col = color(255, 0, 0); // Highlight the bar being placed
-                } else {
-                    bar.col = color(0, 0, 255); // Default color for bars
-                }
-            } else {
-                bar.col = color(0, 0, 255); // Default color for bars
-            }
-
-            // Adjust bar height to ensure it stays within the screen
-            int barHeight = int(map(bar.value.magnitude(), 0, maxMagnitude, 0, height - topMargin));
-            barHeight = constrain(barHeight, 5, height - topMargin); // Ensure a minimum height and fit in screen
-
-            fill(bar.col);
-            rect((i * bars[i].length + j) * barWidth, height - barHeight, barWidth - 2, barHeight);
-        }
-    }
-}
-
+  }
 
   void radixSortStep() {
     if (rState == null) {
@@ -128,24 +144,6 @@ class Visualizer {
 
         rState = null;
     }
-  }
-
-  void initializeArray(int newRows, int newCols) {
-    // Prevent excessive growth or invalid sizes
-    if (newRows < 1) newRows = 1;
-    if (newCols < 1) newCols = 1;
-
-    bars = new Bar[newRows][];  // Initialize row array first
-    for (int i = 0; i < newRows; i++) {
-      bars[i] = new Bar[newCols];  // Initialize column array
-      for (int j = 0; j < newCols; j++) {
-        bars[i][j] = new Bar(new Complex(random(0, 101), random(0, 101)), color(0, 0, 255), i, j);
-      }
-    }
-
-
-    sorting = true;
-    rState = null;
   }
 }
 
