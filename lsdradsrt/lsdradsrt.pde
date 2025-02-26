@@ -10,7 +10,7 @@ void setup() {
   visualizer = new Visualizer();
   visualizer.initializeArray(rows, cols); // Initialize with 2x2 elements
   surface.setResizable(true);
-  frameRate(600);
+  frameRate(60);
 }
 
 void draw() {
