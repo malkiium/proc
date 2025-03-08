@@ -28,15 +28,6 @@ void draw() {
   }
 }
 
-// Recursive function to calculate factorial
-int factorial(int n) {
-  if (n <= 1) {
-    return 1;
-  } else {
-    return n * factorial(n - 1);
-  }
-}
-
 // Class to represent a complex number
 class Complex {
   float real;
