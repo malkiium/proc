@@ -11,7 +11,7 @@ void setup() {
   visualizer = new Visualizer();
   visualizer.initializeArray(barsCount);
   surface.setResizable(true);
-  frameRate(6);
+  frameRate(2);
 }
 
 void draw() {
@@ -20,11 +20,11 @@ void draw() {
 
   fill(0);
   textSize(16);
-  text("Quicksort Visualization", 10, 20);
+  text("Merge Sort Visualization", 10, 20);
   text("Number of bars: " + barsCount, 10, 40);
 
   if (sorting) {
-    if (!visualizer.quickSortStep()) {
+    if (!visualizer.mergeSortStep()) {
       sorting = false;
       sorted = true;
       visualizer.markSorted(); // Ensure sorted bars are marked red
@@ -51,8 +51,8 @@ class Bar {
 
 class Visualizer {
   Bar[] bars;
+  int mergeStep;
   boolean sorting;
-  boolean partitioningInProgress = false;  // To check if partitioning is in progress
 
   void initializeArray(int count) {
     bars = new Bar[count];
@@ -60,6 +60,7 @@ class Visualizer {
       bars[i] = new Bar(random(height - topMargin), color(0, 0, 255));
     }
     sorting = true;
+    mergeStep = 1;
   }
 
   // Modified barDraw() method
@@ -71,48 +72,43 @@ class Visualizer {
     }
   }
 
-  boolean quickSortStep() {
-    if (sorting) {
-      // Start quicksort by calling the partition method
-      quickSort(0, bars.length - 1);
-      sorting = false; // Only perform sorting once, after partitioning
+  boolean mergeSortStep() {
+    if (mergeStep > bars.length) {
+      return false;
+    }
+    
+    for (int i = 0; i < bars.length; i += 2 * mergeStep) {
+      merge(i, min(i + mergeStep, bars.length), min(i + 2 * mergeStep, bars.length));
+    }
+    
+    mergeStep *= 2;
+    if (mergeStep > bars.length) {
+      markSorted();
       return false;
     }
     return true;
   }
 
-  // Step-by-step quicksort
-  void quickSort(int low, int high) {
-    if (low < high) {
-      int pi = partition(low, high);
-      // Swap pivot and recursively sort the subarrays one step at a time
-      partitioningInProgress = true; // Mark partitioning as in progress
-    }
-  }
+  void merge(int left, int mid, int right) {
+    int n1 = mid - left;
+    int n2 = right - mid;
+    Bar[] leftArray = new Bar[n1];
+    Bar[] rightArray = new Bar[n2];
 
-  // Partitioning step: returns the index of pivot after it is placed correctly
-  int partition(int low, int high) {
-    // Choose the pivot element (for simplicity, we'll pick the last element as pivot)
-    Bar pivot = bars[high];
-    int i = low - 1; // index of smaller element
+    for (int i = 0; i < n1; i++) leftArray[i] = bars[left + i];
+    for (int j = 0; j < n2; j++) rightArray[j] = bars[mid + j];
 
-    // Reorder the array so that elements smaller than pivot are to the left
-    // and larger elements are to the right of the pivot
-    for (int j = low; j < high; j++) {
-      if (bars[j].value <= pivot.value) {
-        i++;
-        swap(i, j);
+    int i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+      if (leftArray[i].value <= rightArray[j].value) {
+        bars[k++] = leftArray[i++];
+      } else {
+        bars[k++] = rightArray[j++];
       }
     }
-    // Swap the pivot element with the element at i+1, so the pivot is in its correct position
-    swap(i + 1, high);
-    return i + 1;
-  }
 
-  void swap(int i, int j) {
-    Bar temp = bars[i];
-    bars[i] = bars[j];
-    bars[j] = temp;
+    while (i < n1) bars[k++] = leftArray[i++];
+    while (j < n2) bars[k++] = rightArray[j++];
   }
 
   void markSorted() {
