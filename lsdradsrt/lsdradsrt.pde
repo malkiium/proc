@@ -1,46 +1,29 @@
-int rows = 2; // Number of rows
-int cols = 2; // Number of columns
+int rows = 2;
+int cols = 2;
 boolean sorting = false; // Flag to indicate if sorting is in progress
 RadixSortState rState; // State of the radix sort
-Visualizer visualizer; // Visualizer object to handle drawing
+Visualizer visualizer; 
 int topMargin = 20; // Margin at the top to prevent bars from going out of the screen
 
 void setup() {
-  size(1900, 400); // Set the size of the window
-  visualizer = new Visualizer(); // Create a new Visualizer object
+  size(1900, 400);
+  visualizer = new Visualizer();
   visualizer.initializeArray(rows, cols); // Initialize with 2x2 elements
-  surface.setResizable(true); // Allow the window to be resizable
-  frameRate(60); // Set the frame rate to 60 frames per second
-}
+  surface.setResizable(true);
+  frameRate(60);
 
 void draw() {
   background(255); // Clear the background with white color
   visualizer.barDraw(); // Draw the bars
 
   // Display the number of bars at the top left
-  fill(0); // Set the fill color to black
-  textSize(16); // Set the text size
-  text("Code of Eliott HALL.", 10, 40); // Display the author's name
-  text("Number of bars: " + (visualizer.bars.length * visualizer.bars[0].length), 10, 20); // Display the number of bars
+  fill(0);
+  textSize(16);
+  text("Code of Eliott HALL.", 10, 40);
+  text("Number of bars: " + (visualizer.bars.length * visualizer.bars[0].length), 10, 20);
 
   if (sorting) {
     visualizer.radixSortStep(); // Perform a step of the radix sort if sorting is true
-  }
-}
-
-// Class to represent a complex number
-class Complex {
-  float real;
-  float imag;
-
-  Complex(float real, float imag) {
-    this.real = real;
-    this.imag = imag;
-  }
-
-  // Calculate the magnitude of the complex number
-  float magnitude() {
-    return sqrt(real * real + imag * imag);
   }
 }
 
