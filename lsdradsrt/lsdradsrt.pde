@@ -1,38 +1,68 @@
+// A basic Complex class with real and imaginary parts, and a magnitude method.
+class Complex {
+  float re;
+  float im;
+  
+  Complex(float re, float im) {
+    this.re = re;
+    this.im = im;
+  }
+  
+  // Returns the magnitude (Euclidean norm) of the complex number.
+  float magnitude() {
+    return sqrt(re * re + im * im);
+  }
+}
+
 int rows = 2;
 int cols = 2;
-boolean sorting = false; // Flag to indicate if sorting is in progress
-RadixSortState rState; // State of the radix sort
+boolean sorting = false;    // Flag indicating if sorting is in progress.
+boolean finalPause = false; // Flag for the final pause when sorting completes.
+long pauseStartTime = 0;    // Timestamp to track when the pause started.
+RadixSortState rState;      // Object holding the radix sort state.
 Visualizer visualizer; 
-int topMargin = 20; // Margin at the top to prevent bars from going out of the screen
+int topMargin = 20;         // Margin at the top for drawing bars.
+int stepsPerFrame = 100;    // Sorting steps executed per frame.
 
 void setup() {
   size(1900, 400);
   visualizer = new Visualizer();
-  visualizer.initializeArray(rows, cols); // Initialize with 2x2 elements
+  visualizer.initializeArray(rows, cols); // Initialize the grid with random bars.
   surface.setResizable(true);
   frameRate(60);
+}
 
 void draw() {
-  background(255); // Clear the background with white color
-  visualizer.barDraw(); // Draw the bars
-
-  // Display the number of bars at the top left
+  background(255);
+  visualizer.barDraw(); // Draw all bars.
+  
+  // Display header text.
   fill(0);
   textSize(16);
   text("Code of Eliott HALL.", 10, 40);
-  text("Number of bars: " + (visualizer.bars.length * visualizer.bars[0].length), 10, 20);
-
+  int totalBars = visualizer.rows * visualizer.cols;
+  text("Number of bars: " + totalBars, 10, 20);
+  
+  // Process multiple radix sort steps per frame.
   if (sorting) {
-    visualizer.radixSortStep(); // Perform a step of the radix sort if sorting is true
+    for (int s = 0; s < stepsPerFrame && sorting; s++) {
+      visualizer.radixSortStep();
+    }
+  }
+  
+  // After sorting, wait for 1 second before expanding the grid.
+  if (finalPause && (millis() - pauseStartTime >= 1000)) {
+    visualizer.expandGrid();
+    finalPause = false;
   }
 }
 
-// Class to represent a bar in the visualization
+// Represents a visual bar with a Complex value.
 class Bar {
   Complex value;
   color col;
   int row, colIndex;
-
+  
   Bar(Complex value, color col, int row, int colIndex) {
     this.value = value;
     this.col = col;
@@ -41,183 +71,185 @@ class Bar {
   }
 }
 
-// Class to handle the visualization
+// Handles visualization of the array and sorting.
 class Visualizer {
-  Bar[][] bars; // 2D array of bars
-  float initialMaxMagnitude; // Initial maximum magnitude of the bars
-
-  // Initialize the array of bars
+  Bar[][] bars;           // 2D array of bars.
+  float initialMaxMagnitude;  // Used to scale bar heights.
+  int rows, cols;         // Current grid dimensions.
+  
+  // Initializes a new array of bars.
   void initializeArray(int newRows, int newCols) {
-    // Prevent excessive growth or invalid sizes
-    if (newRows < 1) newRows = 1;
-    if (newCols < 1) newCols = 1;
-
-    bars = new Bar[newRows][]; // Initialize row array first
-    for (int i = 0; i < newRows; i++) {
-      bars[i] = new Bar[newCols]; // Initialize column array
-      for (int j = 0; j < newCols; j++) {
-        bars[i][j] = new Bar(new Complex(random(0, 101), random(0, 101)), color(0, 0, 255), i, j); // Create a new bar with random values
+    rows = max(newRows, 1);
+    cols = max(newCols, 1);
+    bars = new Bar[rows][cols];
+    
+    // Populate the grid with bars having random complex values.
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        bars[i][j] = new Bar(new Complex(random(0, 101), random(0, 101)), color(0, 0, 255), i, j);
       }
     }
-
-    // Calculate the initial maximum magnitude
+    
+    // Determine the maximum magnitude for scaling.
     initialMaxMagnitude = 0;
-    for (int i = 0; i < bars.length; i++) {
-      for (int j = 0; j < bars[i].length; j++) {
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
         initialMaxMagnitude = max(initialMaxMagnitude, bars[i][j].value.magnitude());
       }
     }
-
-    sorting = true; // Set sorting to true
-    rState = null; // Reset the radix sort state
+    
+    sorting = true;   // Begin sorting.
+    rState = null;    // Reset sort state.
   }
-
-  // Draw the bars
+  
+  // Draws the bars on screen.
   void barDraw() {
-    int minBarWidth = 1; // Minimum bar width (adjust as needed)
-    int barWidth = max(minBarWidth, width / (bars.length * bars[0].length)); // Calculate the bar width
-
-    for (int i = 0; i < bars.length; i++) {
-      for (int j = 0; j < bars[i].length; j++) {
+    int totalBars = rows * cols;
+    int barWidth = max(1, width / totalBars);
+    
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
         Bar bar = bars[i][j];
-
-        // Highlight the current bar being processed
+        int flatIndex = i * cols + j; // Flatten the 2D index.
+        
+        // Change color based on the sorting state.
         if (rState != null) {
-          if ((rState.phase == 0 || rState.phase == 1 || rState.phase == 3) && i == rState.countIndex) {
-            bar.col = color(255, 0, 0); // Red color for the current bar
-          } else if (rState.phase == 2 && i == rState.placeIndex) {
-            bar.col = color(255, 0, 0); // Red color for the bar being placed
+          if ((rState.phase == 0 || rState.phase == 1 || rState.phase == 3) && flatIndex == rState.countIndex) {
+            bar.col = color(255, 0, 0);  // Red for current counting phase.
+          } else if (rState.phase == 2 && flatIndex == rState.placeIndex) {
+            bar.col = color(255, 0, 0);  // Red when placing into output.
           } else {
-            bar.col = color(0, 0, 255); // Default color for bars
+            bar.col = color(0, 0, 255);  // Default blue.
           }
         } else {
-          bar.col = color(0, 0, 255); // Default color for bars
+          bar.col = color(0, 0, 255);
         }
-
-        // Adjust bar height based on the initial maximum magnitude
+        
+        // Compute the bar's height and draw it.
         int barHeight = int(map(bar.value.magnitude(), 0, initialMaxMagnitude, 0, height - topMargin));
-        barHeight = constrain(barHeight, 5, height - topMargin); // Ensure a minimum height and fit in screen
-
-        fill(bar.col); // Set the fill color to the bar's color
-        rect((i * bars[i].length + j) * barWidth, height - barHeight, barWidth - 2, barHeight); // Draw the bar
+        barHeight = constrain(barHeight, 5, height - topMargin);
+        rect(flatIndex * barWidth, height - barHeight, barWidth - 2, barHeight);
       }
     }
   }
-
-  // Perform a step of the radix sort
+  
+  // Executes one step of the radix sort.
   void radixSortStep() {
     if (rState == null) {
-      rState = new RadixSortState(bars); // Initialize the radix sort state
+      rState = new RadixSortState(bars, rows, cols);
     }
-
-    rState.step(); // Perform a step of the radix sort
-
+    rState.step();
+    
+    // When sorting is done, mark for a final pause.
     if (rState.done) {
-      bars = rState.bars; // Update the bars with the sorted bars
-      sorting = false; // Set sorting to false
-      delay(1000); // Delay for 1 second
-
-      // Only increase one of the dimensions at a time
-      if (bars.length < bars[0].length) {
-        initializeArray(bars.length * 2, bars[0].length); // Grow rows first
-      } else {
-        initializeArray(bars.length, bars[0].length * 2); // Then grow columns
-      }
-
-      rState = null; // Reset the radix sort state
+      bars = rState.bars;
+      sorting = false;
+      finalPause = true;
+      pauseStartTime = millis();
     }
+  }
+  
+  // Doubles the grid dimensions after the pause.
+  void expandGrid() {
+    if (rows < cols) {
+      initializeArray(rows * 2, cols);
+    } else {
+      initializeArray(rows, cols * 2);
+    }
+    rState = null;
   }
 }
 
-// Class to handle the state of the radix sort
+// Maintains state for a single pass of radix sort.
 class RadixSortState {
-  Bar[][] bars; // 2D array of bars
-  int exp; // Current exponent (1, 10, 100, ...)
-  int phase; // 0: counting frequency, 1: cumulative count, 2: placing into output, 3: copying output back
-  int countIndex; // Iterator for counting/copying phases
-  int placeIndex; // Iterator for placing phase (processes values in reverse)
-  int[] count; // Frequency count array for digits 0-9
-  Bar[][] output; // Temporary array to hold sorted order for the current digit
-  float maxVal; // Maximum value in the array (to determine when sorting is done)
-  boolean done; // Flag indicating if sorting is complete
-
-  RadixSortState(Bar[][] arr) {
+  Bar[][] bars;
+  int rows, cols;
+  int exp;         // Exponent: 1, 10, 100, etc.
+  int phase;       // 0: count, 1: cumulative, 2: place, 3: copy back.
+  int countIndex;  // Index used in counting/copy phases.
+  int placeIndex;  // Index used in placing phase.
+  int[] count;     // Frequency array for digits 0-9.
+  Bar[][] output;  // Temporary array for sorted order.
+  float maxVal;    // Maximum value in the array.
+  boolean done;    // Flag indicating completion of sort.
+  
+  RadixSortState(Bar[][] arr, int rows, int cols) {
+    this.rows = rows;
+    this.cols = cols;
     bars = arr;
     maxVal = 0;
-    for (int i = 0; i < bars.length; i++) {
-      for (int j = 0; j < bars[i].length; j++) {
-        if (bars[i][j].value.magnitude() > maxVal) maxVal = bars[i][j].value.magnitude(); // Find the maximum value
-      }
+    int total = rows * cols;
+    // Find the maximum magnitude to decide when to stop.
+    for (int i = 0; i < total; i++) {
+      int r = i / cols;
+      int c = i % cols;
+      float mag = bars[r][c].value.magnitude();
+      if (mag > maxVal) maxVal = mag;
     }
-    exp = 1; // Initialize exponent to 1
-    phase = 0; // Start with the counting frequency phase
-    countIndex = 0; // Initialize count index
-    placeIndex = bars.length * bars[0].length - 1; // Initialize place index
-    count = new int[10]; // Initialize count array
-    int newRows = bars.length > 0 ? bars.length : 1;
-    int newCols = bars.length > 0 && bars[0].length > 0 ? bars[0].length : 1;
-    output = new Bar[newRows][newCols]; // Initialize output array
-    done = false; // Set done to false
+    exp = 1;
+    phase = 0;
+    countIndex = 0;
+    placeIndex = total - 1;
+    count = new int[10];
+    output = new Bar[rows][cols];
+    done = false;
   }
-
-  // Perform a step of the radix sort
+  
+  // Process a single step of the radix sort algorithm.
   void step() {
     if (exp > maxVal) {
-      done = true; // Set done to true if exponent is greater than the maximum value
+      done = true;
       return;
     }
-
-    if (phase == 0) {
-      // Counting frequency of digits
-      if (countIndex < bars.length * bars[0].length) {
-        int i = countIndex / bars[0].length;
-        int j = countIndex % bars[0].length;
+    
+    int total = rows * cols;
+    if (phase == 0) { // Counting frequency of digits.
+      if (countIndex < total) {
+        int i = countIndex / cols;
+        int j = countIndex % cols;
         int digit = int((bars[i][j].value.magnitude() / exp) % 10);
-        count[digit]++; // Increment the count for the digit
+        count[digit]++;
         countIndex++;
       } else {
-        phase = 1; // Move to the cumulative count phase
+        phase = 1;
         countIndex = 0;
       }
-    } else if (phase == 1) {
-      // Cumulative count
+    } else if (phase == 1) { // Convert counts to cumulative counts.
       if (countIndex < 9) {
-        count[countIndex + 1] += count[countIndex]; // Update the cumulative count
+        count[countIndex + 1] += count[countIndex];
         countIndex++;
       } else {
-        phase = 2; // Move to the placing into output phase
-        placeIndex = bars.length * bars[0].length - 1;
+        phase = 2;
+        placeIndex = total - 1;
       }
-    } else if (phase == 2) {
-      // Placing into output array
+    } else if (phase == 2) { // Place elements into output array.
       if (placeIndex >= 0) {
-        int i = placeIndex / bars[0].length;
-        int j = placeIndex % bars[0].length;
+        int i = placeIndex / cols;
+        int j = placeIndex % cols;
         int digit = int((bars[i][j].value.magnitude() / exp) % 10);
         int outputIndex = count[digit] - 1;
-        int outputRow = outputIndex / bars[0].length;
-        int outputCol = outputIndex % bars[0].length;
-        output[outputRow][outputCol] = bars[i][j]; // Place the bar in the output array
+        int outRow = outputIndex / cols;
+        int outCol = outputIndex % cols;
+        output[outRow][outCol] = bars[i][j];
         count[digit]--;
         placeIndex--;
       } else {
-        phase = 3; // Move to the copying output back phase
+        phase = 3;
         countIndex = 0;
       }
-    } else if (phase == 3) {
-      // Copying output back to bars array
-      if (countIndex < bars.length * bars[0].length) {
-        int i = countIndex / bars[0].length;
-        int j = countIndex % bars[0].length;
-        bars[i][j] = output[i][j]; // Copy the bar from the output array to the bars array
+    } else if (phase == 3) { // Copy sorted elements back.
+      if (countIndex < total) {
+        int i = countIndex / cols;
+        int j = countIndex % cols;
+        bars[i][j] = output[i][j];
         countIndex++;
       } else {
-        exp *= 10; // Move to the next digit
-        phase = 0; // Reset to the counting frequency phase
+        exp *= 10; // Move to next digit.
+        phase = 0;
         countIndex = 0;
-        placeIndex = bars.length * bars[0].length - 1;
-        count = new int[10]; // Reset the count array
-        output = new Bar[bars.length][bars[0].length]; // Reset the output array
+        placeIndex = total - 1;
+        count = new int[10];  // Reset count array.
+        output = new Bar[rows][cols];  // Reset output array.
       }
     }
   }
