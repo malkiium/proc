@@ -1,17 +1,19 @@
+import java.util.Stack;
+
 int barsCount = 2; // Start with 2 bars
 boolean sorting = true;
 Visualizer visualizer;
 int topMargin = 20;
 boolean sorted = false;
 int lastSortTime = 0;
-int delayTime = 500;
+int delayTime = 500; // Reduced delay time for faster transitions
 
 void setup() {
   size(1900, 400);
   visualizer = new Visualizer();
   visualizer.initializeArray(barsCount);
   surface.setResizable(true);
-  frameRate(6);
+  frameRate(60); // Increased frame rate for smoother and faster sorting
 }
 
 void draw() {
@@ -24,14 +26,17 @@ void draw() {
   text("Number of bars: " + barsCount, 10, 40);
 
   if (sorting) {
-    if (!visualizer.quickSortStep()) {
-      sorting = false;
-      sorted = true;
-      visualizer.markSorted(); // Ensure sorted bars are marked red
-      lastSortTime = millis(); // Capture the time when sorting completes
+    for (int i = 0; i < 10; i++) { // Perform multiple sorting steps per frame
+      if (!visualizer.quickSortStep()) {
+        sorting = false;
+        sorted = true;
+        visualizer.markSorted(); // Ensure sorted bars are marked red
+        lastSortTime = millis(); // Capture the time when sorting completes
+        break;
+      }
     }
-  } else if (sorted && millis() - lastSortTime >= delayTime) {
-    // Wait 0.5 sec, then double bars and restart sorting
+  } else if (sorted && millis() - lastSortTime >= 500) {
+    // Wait briefly, then double bars and restart sorting
     barsCount *= 2;
     visualizer.initializeArray(barsCount);
     sorting = true;
@@ -51,8 +56,8 @@ class Bar {
 
 class Visualizer {
   Bar[] bars;
-  boolean sorting;
-  boolean partitioningInProgress = false;  // To check if partitioning is in progress
+  Stack<int[]> stack = new Stack<int[]>(); // Stack for iterative quicksort
+  boolean sorting = true;
 
   void initializeArray(int count) {
     bars = new Bar[count];
@@ -60,9 +65,10 @@ class Visualizer {
       bars[i] = new Bar(random(height - topMargin), color(0, 0, 255));
     }
     sorting = true;
+    stack.clear();
+    stack.push(new int[]{0, bars.length - 1}); // Push initial range
   }
 
-  // Modified barDraw() method
   void barDraw() {
     int barWidth = max(2, width / bars.length); // Ensures bars never disappear
     for (int i = 0; i < bars.length; i++) {
@@ -72,39 +78,32 @@ class Visualizer {
   }
 
   boolean quickSortStep() {
-    if (sorting) {
-      // Start quicksort by calling the partition method
-      quickSort(0, bars.length - 1);
-      sorting = false; // Only perform sorting once, after partitioning
-      return false;
+    if (!stack.isEmpty()) {
+      int[] range = stack.pop();
+      int low = range[0], high = range[1];
+
+      if (low < high) {
+        int pi = partition(low, high);
+
+        // Push subarrays onto stack to process them in future frames
+        stack.push(new int[]{low, pi - 1});
+        stack.push(new int[]{pi + 1, high});
+      }
+      return true; // Sorting still in progress
     }
-    return true;
+    return false; // Sorting done
   }
 
-  // Step-by-step quicksort
-  void quickSort(int low, int high) {
-    if (low < high) {
-      int pi = partition(low, high);
-      // Swap pivot and recursively sort the subarrays one step at a time
-      partitioningInProgress = true; // Mark partitioning as in progress
-    }
-  }
-
-  // Partitioning step: returns the index of pivot after it is placed correctly
   int partition(int low, int high) {
-    // Choose the pivot element (for simplicity, we'll pick the last element as pivot)
     Bar pivot = bars[high];
-    int i = low - 1; // index of smaller element
-
-    // Reorder the array so that elements smaller than pivot are to the left
-    // and larger elements are to the right of the pivot
+    int i = low - 1;
+    
     for (int j = low; j < high; j++) {
       if (bars[j].value <= pivot.value) {
         i++;
         swap(i, j);
       }
     }
-    // Swap the pivot element with the element at i+1, so the pivot is in its correct position
     swap(i + 1, high);
     return i + 1;
   }
