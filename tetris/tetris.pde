@@ -83,9 +83,18 @@ class Tetromino {
         newShape[j][shape.length - 1 - i] = shape[i][j];
       }
     }
-    shape = newShape;
-    if (collision()) {
-      shape = newShape;
+    
+    // Apply Super Rotation System (SRS) wall kicks
+    int[][] kicks = {{0, 0}, {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    for (int i = 0; i < kicks.length; i++) {
+      x += kicks[i][0];
+      y += kicks[i][1];
+      if (!collision()) {
+        shape = newShape;
+        return;
+      }
+      x -= kicks[i][0];
+      y -= kicks[i][1];
     }
   }
   
@@ -95,7 +104,7 @@ class Tetromino {
         int newX = x + i;
         int newY = y + j;
         if (shape[i][j] == 1) {
-          if (newX < 0 || newX >= cols || newY >= rows || grid[newX][newY] == 1) {
+          if (newX < 0 || newX >= cols || newY >= rows || (newY >= 0 && grid[newX][newY] == 1)) {
             return true;
           }
         }
@@ -119,18 +128,18 @@ class Tetromino {
 
 int[][] randomShape() {
   int[][][] shapes = {
-    {{1, 1, 1, 1}},
-    {{1, 1}, {1, 1}},
-    {{0, 1, 0}, {1, 1, 1}},
-    {{1, 0, 0}, {1, 1, 1}},
-    {{0, 0, 1}, {1, 1, 1}}
+    {{1, 1, 1, 1}}, // I shape
+    {{1, 1}, {1, 1}}, // O shape
+    {{0, 1, 0}, {1, 1, 1}}, // T shape
+    {{1, 0, 0}, {1, 1, 1}}, // L shape
+    {{0, 0, 1}, {1, 1, 1}} // J shape
   };
-  return shapes[int(random(shapes.length))];
+  return shapes[(int) random(shapes.length)];
 }
 
 color randomColor() {
   color[] colors = {color(255, 0, 0), color(0, 255, 0), color(0, 0, 255), color(255, 255, 0), color(255, 165, 0), color(128, 0, 128)};
-  return colors[int(random(colors.length))];
+  return colors[(int) random(colors.length)];
 }
 
 void checkLines() {
