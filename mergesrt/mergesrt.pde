@@ -11,7 +11,7 @@ void setup() {
   visualizer = new Visualizer();
   visualizer.initializeArray(barsCount);
   surface.setResizable(true);
-  frameRate(60);
+  frameRate(6);
 }
 
 void draw() {
