@@ -1,4 +1,4 @@
-int barsCount = 2; // Start with 2 bars
+int barsCount; // Nombre de barres défini par l'utilisateur
 boolean sorting = true;
 Visualizer visualizer;
 int topMargin = 20;
@@ -8,10 +8,16 @@ int delayTime = 500;
 
 void setup() {
   size(1900, 400);
+  
+  // Demande à l'utilisateur de choisir le nombre initial de barres
+  barsCount = int(random(10, 50)); // Exemple : entre 10 et 50 barres
+  println("Nombre initial de barres : " + barsCount);
+  
   visualizer = new Visualizer();
   visualizer.initializeArray(barsCount);
+  
   surface.setResizable(true);
-  frameRate(60);
+  frameRate(6);
 }
 
 void draw() {
@@ -27,11 +33,11 @@ void draw() {
     if (!visualizer.mergeSortStep()) {
       sorting = false;
       sorted = true;
-      visualizer.markSorted(); // Ensure sorted bars are marked red
-      lastSortTime = millis(); // Capture the time when sorting completes
+      visualizer.markSorted(); // Marque les barres triées en rouge
+      lastSortTime = millis(); // Enregistre le temps de fin du tri
     }
   } else if (sorted && millis() - lastSortTime >= delayTime) {
-    // Wait 0.5 sec, then double bars and restart sorting
+    // Attente de 0.5 sec, puis doublement des barres et redémarrage du tri
     barsCount *= 2;
     visualizer.initializeArray(barsCount);
     sorting = true;
@@ -43,6 +49,13 @@ class Bar {
   float value;
   color col;
 
+  // Constructeur par défaut
+  Bar() {
+    this.value = 0;
+    this.col = color(0, 0, 255);
+  }
+
+  // Constructeur avec paramètres
   Bar(float value, color col) {
     this.value = value;
     this.col = col;
@@ -63,9 +76,8 @@ class Visualizer {
     mergeStep = 1;
   }
 
-  // Modified barDraw() method
   void barDraw() {
-    int barWidth = max(2, width / bars.length); // Ensures bars never disappear
+    int barWidth = max(2, width / bars.length); // Empêche les barres de disparaître
     for (int i = 0; i < bars.length; i++) {
       fill(bars[i].col);
       rect(i * barWidth, height - bars[i].value, barWidth - 1, bars[i].value);
@@ -113,7 +125,7 @@ class Visualizer {
 
   void markSorted() {
     for (int i = 0; i < bars.length; i++) {
-      bars[i].col = color(255, 0, 0); // Mark bars as sorted (red)
+      bars[i].col = color(255, 0, 0); // Marque les barres triées en rouge
     }
   }
 }
