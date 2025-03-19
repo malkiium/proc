@@ -9,7 +9,6 @@ int delayTime = 500;
 void setup() {
   size(1900, 400);
   
-  // Demande à l'utilisateur de choisir le nombre initial de barres
   barsCount = int(random(10, 50)); // Exemple : entre 10 et 50 barres
   println("Nombre initial de barres : " + barsCount);
   
