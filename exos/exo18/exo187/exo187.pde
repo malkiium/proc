@@ -1,3 +1,4 @@
+
 class Goutte {
   float x, y;     // Position
   float v;        // Vitesse
@@ -24,6 +25,46 @@ class Goutte {
     fill(c);
     noStroke();
     ellipse(x, y, 2 * r, 2 * r);
+  }
+}
+
+class Attrapeur {
+  float r;    // Rayon
+  float x, y; // Position
+
+  Attrapeur(float r) {
+    this.r = r;
+    x = 0;
+    y = 0;
+  }
+
+  void placer(float x, float y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  void dessiner() {
+    stroke(0);
+    fill(175);
+    ellipse(x, y, 2 * r, 2 * r);
+  }
+}
+
+class Chronometre {
+  int start;
+  int tempsTotal;
+
+  Chronometre(int tempsTotal) {
+    start = millis();
+    this.tempsTotal = tempsTotal;
+  }
+
+  void lancer() {
+    start = millis();
+  }
+
+  boolean estTermine() {
+    return millis() - start > tempsTotal;
   }
 }
 
