@@ -1,4 +1,4 @@
-Molecule[] molecules = new Molecule[10];
+Molecule[] molecules = new Molecule[7];
 
 void setup() {
     surface.setResizable(true);
