@@ -81,5 +81,4 @@ class Molecule {
             circle(pos.x-(this.vx)*(r/4), pos.y-(this.vy)*(r/4), 1.5*this.r); // dessine la traînée avec un décalage
         }
     }
-
 }
