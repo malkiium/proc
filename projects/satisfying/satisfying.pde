@@ -1,15 +1,21 @@
+int scaler = 2;
 PVector center;
-float bigRadius = 500;
+float bigRadius = 500/scaler;
 float ballRadius = 10;
 PVector ballPos;
 PVector ballVel;
 PVector gravity;
 float currentHue = 0;
 
-void setup() {
-  size(1080, 1920);
-  background(0);
+
+void settings() {
+  size(1080/scaler, 1920/scaler);
   smooth(128);
+}
+void setup() {
+
+  background(0);
+
   colorMode(HSB, 255);  // HSB for easy hue cycling
   center = new PVector(width/2, height/2);
   ballPos = center.copy();
