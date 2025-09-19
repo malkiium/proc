@@ -1,26 +1,19 @@
-int[] values;
-int numBars = 20;
+class Bars {
+    ArrayCreator data;
 
-void setup() {
-    size(1900, 1000);
-    values = new int[numBars];
-
-    for (int i = 0; i < numBars; i++) {
-        values[i] = int(random(0, 100));
+    Bars(ArrayCreator data) {
+        this.data = data;
     }
-}
 
-void draw() {
-    background(0);
+    void display() {
+        float barWidth = width / float(data.values.length);
 
-    float barWidth = width / float(values.length);
+        for (int j = 0; j < data.values.length; j++) {
+            float barHeight = map(data.values[j], 0, 100, 0, height - 50);
+            float x = j * barWidth;
 
-    for (int j = 0; j < values.length; j++){
-        float barHeight = map(values[j], 0, 100, 0, height-50);
-
-        float x = j*barWidth;
-
-        fill(100, 200, 250);
-        rect(x, height - barHeight, barWidth, barHeight);
+            fill(100, 200, 250);
+            rect(x, height - barHeight, barWidth, barHeight);
+        }
     }
 }
