@@ -49,7 +49,7 @@ void draw() {
   println(fps);
   frameRate(fps);
   background(0);
-  paddleX = ballX;
+
   paddleY = height - 30;
 
   brickWidth = width / 15; // Update brick width based on current window size
