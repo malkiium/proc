@@ -4,20 +4,25 @@ String rgb;
 boolean turnOff = false;
 
 void setup() {
-  size(400, 400);
-  int t = 25; // taille du bouton
-  rUp = new Bouton(width / 2 - 2 * t, height / 2 - t, t, color(255, 0, 0), '+');
-  rDown = new Bouton(width / 2 - 2 * t, height / 2 + t, t, color(255, 0, 0), '-');
-  gUp = new Bouton(width / 2, height / 2 - t, t, color(0, 255, 0), '+');
-  gDown = new Bouton(width / 2, height / 2 + t, t, color(0, 255, 0), '-');
-  bUp = new Bouton(width / 2 + 2 * t, height / 2 - t, t, color(0, 0, 255), '+');
-  bDown = new Bouton(width / 2 + 2 * t, height / 2 + t, t, color(0, 0, 255), '-');
-  onOff = new Bouton(width/2+4*t, height/2, t, color(255,255,255), 'O' );
+    size(400, 400);
+    int t = 25; // taille du bouton
+    rUp = new Bouton(width / 2 - 2 * t, height / 2 - t, t, color(255, 0, 0), '+');
+    rDown = new Bouton(width / 2 - 2 * t, height / 2 + t, t, color(255, 0, 0), '-');
+    gUp = new Bouton(width / 2, height / 2 - t, t, color(0, 255, 0), '+');
+    gDown = new Bouton(width / 2, height / 2 + t, t, color(0, 255, 0), '-');
+    bUp = new Bouton(width / 2 + 2 * t, height / 2 - t, t, color(0, 0, 255), '+');
+    bDown = new Bouton(width / 2 + 2 * t, height / 2 + t, t, color(0, 0, 255), '-');
+    onOff = new Bouton(width/2+4*t, height/2, t, color(255,255,255), 'O' );
 }
 
 void draw() {
-  background(r, g, b);
-  noStroke();
+    if (turnOff) {
+        background(0);
+    } else {
+        background(r, g, b);
+    }
+
+    noStroke();
     fill(0);
     rectMode(CORNER);
     rect(10, 10, width - 20, 40);
@@ -34,36 +39,30 @@ void draw() {
     bUp.dessiner();
     bDown.dessiner();
     onOff.dessiner();
-    
 
-  if (mousePressed) {
+    if (mousePressed) {
     if (rUp.sourisDedans()) {
-      r++;
+        r++;
     } else if (rDown.sourisDedans()) {
-      r--;
+        r--;
     } else if (gUp.sourisDedans()) {
-      g++;
+        g++;
     } else if (gDown.sourisDedans()) {
-      g--;
+        g--;
     } else if (bUp.sourisDedans()) {
-      b++;
+        b++;
     } else if (bDown.sourisDedans()) {
-      b--;
+        b--;
     }
-
-    if (turnOff) {
-        background(0);
-    }
-    onOff.dessiner();
 
     r = constrain(r, 0, 255);
     g = constrain(g, 0, 255);
     b = constrain(b, 0, 255);
-  }
+    }
 }
 
 void keyPressed() {
-  println(rgb);
+    println(rgb);
 }
 
 void mousePressed() {
