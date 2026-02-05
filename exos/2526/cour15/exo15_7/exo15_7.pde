@@ -36,20 +36,17 @@ void draw() {
   float margeHaut = 40;
   float barWidth = width / distrib.length;
 
-  // Barres
   for (int lnt = 0; lnt < distrib.length; lnt++) {
     float barHeight = map(distrib[lnt], 0, eMax, 0, height - margeHaut);
     rect(barWidth * lnt, height, barWidth, -barHeight);
   }
-
-  // Lignes horizontales
+  
   int nbLignes = eMax;
   for (int lin = 0; lin <= nbLignes; lin++) {
     float y = height - map(lin, 0, nbLignes, 0, height - margeHaut);
     line(0, y, width, y);
   }
 
-  // Ligne de moyenne
   stroke(255,0,0);
   float lnpos = barWidth * moyenne + barWidth/2;
   line(lnpos, 0, lnpos, height);
