@@ -33,21 +33,30 @@ void draw() {
   fill(255);
   stroke(0);
 
-  float margeHaut = 40;
-  float barWidth = width / distrib.length;
+  float marginHaut = 40;
+  float marginLeft = 30;
+  float marginBottom = 30;
+  float barWidth = (width-marginLeft) / distrib.length;
 
   for (int lnt = 0; lnt < distrib.length; lnt++) {
-    float barHeight = map(distrib[lnt], 0, eMax, 0, height - margeHaut);
-    rect(barWidth * lnt, height, barWidth, -barHeight);
-  }
-  
-  int nbLignes = eMax;
-  for (int lin = 0; lin <= nbLignes; lin++) {
-    float y = height - map(lin, 0, nbLignes, 0, height - margeHaut);
-    line(0, y, width, y);
+    float barHeight = map(distrib[lnt], 0, eMax, 0, height - marginHaut);
+    rect(marginLeft + barWidth * lnt, height-marginBottom, barWidth, -barHeight);
+    text(lnt, (marginLeft+marginLeft/2)+ barWidth * lnt, height-marginBottom/2);
   }
 
-  stroke(255,0,0);
-  float lnpos = barWidth * moyenne + barWidth/2;
-  line(lnpos, 0, lnpos, height);
+  int nbLignes = eMax;
+  for (int lin = 0; lin <= nbLignes; lin++) {
+    float y = height - map(lin, 0, nbLignes, 0, height - marginHaut);
+    stroke(0, 50);
+    line(marginLeft, y-marginBottom, width, y-marginBottom);
+  }
+
+  stroke(255, 0, 0);
+  float lnpos = marginLeft + barWidth * moyenne - 1;
+  line(lnpos, 0, lnpos, height-marginBottom);
+
+  for (int nmb = eMax; nmb > 0; nmb--) {
+    float lnY = map(nmb, 0, eMax, height, marginHaut)+5;
+    text(nmb, 10, lnY-marginBottom);
+  }
 }
