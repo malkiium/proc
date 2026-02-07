@@ -28,6 +28,8 @@ class Bandes {
   }
 
   void rollover(float mx) {
-    mouse = (mx > x && mx < x + w);
+    if (mx > x && mx < x + w) {
+      mouse = true;
+    }
   }
 }
