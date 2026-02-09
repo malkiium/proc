@@ -55,7 +55,7 @@ void draw() {
   float lnpos = marginLeft + barWidth * moyenne - 1;
   line(lnpos, 0, lnpos, height-marginBottom);
 
-  for (int nmb = eMax; nmb > 0; nmb--) {
+  for (int nmb = eMax; nmb >= 0; nmb--) {
     float lnY = map(nmb, 0, eMax, height, marginHaut)+5;
     text(nmb, 10, lnY-marginBottom);
   }
