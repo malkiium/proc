@@ -7,12 +7,13 @@ int eMax = 0;
 
 void setup() {
   size(800, 400);
-
+  surface.setResizable(true);
+  
   sNotes = loadStrings("notes.txt");
   notes = int(sNotes);
   distrib = new int[21];
 
-  for (int i = 0; i<sNotes.length; i++) {
+  for (int i = 0; i<notes.length; i++) {
     sommeNotes += notes[i];
     distrib[notes[i]] += 1;
   }
