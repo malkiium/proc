@@ -4,12 +4,13 @@ int CSIndex = 0;
 
 void setup() {
   size(800, 800);
-  predator = new Snake(50, color(255, 0, 0), random(2, 4), random(width), random(height));
+  predator = new Snake(50, color(255, 0, 0), random(2, 5), random(width), random(height));
   for (int i = 0; i < followers.length; i++) {
     followers[i] = new Snake(int(random(20, 80)),
       color(255), random(2, 10),
       random(width), random(height));
   }
+  frameRate(180);
 }
 
 void draw() {
@@ -40,10 +41,10 @@ void draw() {
       float fleeY = followers[i].getYTete() + dy;
 
       // arret au bord. (pas contrain car il fiatu n arret net. pas de glissement)
-      if (fleeX < 0) fleeX = 0;
-      if (fleeX > width) fleeX = width;
-      if (fleeY < 0) fleeY = 0;
-      if (fleeY > height) fleeY = height;
+      if (fleeX < 1) fleeX = 0;
+      if (fleeX > width-1) fleeX = width;
+      if (fleeY < 1) fleeY = 0;
+      if (fleeY > height-1) fleeY = height;
 
 
       followers[i].avancerVers(fleeX, fleeY);
