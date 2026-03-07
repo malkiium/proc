@@ -1,13 +1,14 @@
-int cells = 450;
+int cells = 500;
 int[] t = new int[cells];
 int[] nextt = new int[cells];
-int regle = 18; // 18, 73, 
-int taille = 900/cells;
+int regle = 18; // 18, 73, 57, 62, 105, 129, 182
+int taille = 1000/cells;
 int ligne = 0;
 
 void setup() {
-  size(900, 900);
+  size(1000, 1000);
   t[t.length/2] = 1;
+  frameRate(1000);
 }
 
 
@@ -31,7 +32,7 @@ void draw() {
   }
   ligne+= 1;
 
-  /*
+  // /*
   if (ligne >= cells) {
     background(255);
     regle +=1;
@@ -42,8 +43,8 @@ void draw() {
     }
     println(regle);
   } 
-  */
 }
+ // */
 
 int cellule(int[] etat, int i) {
   return etat[(i + etat.length) % etat.length];
