@@ -1,7 +1,7 @@
 int cells = 500;
 int[] t = new int[cells];
 int[] nextt = new int[cells];
-int regle = 18; // 18, 73, 57, 62, 105, 129, 182
+int regle = 0; // 18, 73, 57, 62, 105, 129, 182
 int taille = 1000/cells;
 int ligne = 0;
 
