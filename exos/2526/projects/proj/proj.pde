@@ -1,30 +1,54 @@
-ArrayList<ArrayList<Integer>> disk1 = new ArrayList<ArrayList<Integer>>();
-ArrayList<ArrayList<Integer>> disk2 = new ArrayList<ArrayList<Integer>>();
-ArrayList<ArrayList<Integer>> disk3 = new ArrayList<ArrayList<Integer>>();
+/*
+Simulation simple d'evolution
+ */
+
+Balle[] balles;
+Evolution evolution;
+
+int ballCount = 1000;
+int bestCount = 10;
+float minAccel = -0.001;
+float maxAccel = 0.001;
+int frameRateValue = 120;
+int generationTime = 3; // in seconds
+int timer = 0;
+int generationDuration;
+float targetX;
+int padding = 30;
 
 void setup() {
-  size(800, 600);
-  background(255);
+  size(1000, 600);
+  frameRate(frameRateValue);
 
-  // Initialize disks
-  disk1.add(new ArrayList<Integer>(List.of(0,0,0,1)));
-  disk1.add(new ArrayList<Integer>(List.of(0,0,1,0)));
-  disk1.add(new ArrayList<Integer>(List.of(0,1,0,0)));
-  disk1.add(new ArrayList<Integer>(List.of(1,0,0,0)));
+  generationDuration = generationTime * frameRateValue;
+  targetX = random(padding, width - padding);
 
-  disk2.add(new ArrayList<Integer>(List.of(0,1,0,1)));
-  disk2.add(new ArrayList<Integer>(List.of(0,1,1,0)));
-  disk2.add(new ArrayList<Integer>(List.of(1,1,0,0)));
-  disk2.add(new ArrayList<Integer>(List.of(1,0,1,0)));
+  balles = new Balle[ballCount];
+  evolution = new Evolution(bestCount, minAccel, maxAccel);
 
-  disk3.add(new ArrayList<Integer>(List.of(0,1,1,1)));
-  disk3.add(new ArrayList<Integer>(List.of(0,1,1,0)));
-  disk3.add(new ArrayList<Integer>(List.of(1,1,0,1)));
-  disk3.add(new ArrayList<Integer>(List.of(1,0,1,1)));
+  for (int i = 0; i < balles.length; i++) {
+    balles[i] = new Balle(random(-0.2, 0.2));
+  }
+}
 
-  // RAIDs
-  new Raid0(disk1, disk2).show();
-  new Raid1(disk1).show();
-  new Raid4(disk1, disk2, disk3).show();
-  new Raid5(disk1, disk2, disk3).show();
+void draw() {
+  background(0);
+
+  stroke(255, 0, 0);
+  line(targetX, 0, targetX, height);
+
+  updateTimer();
+
+  for (Balle b : balles) {
+    b.move();
+    b.display();
+  }
+}
+
+void updateTimer() {
+  timer++;
+  if (timer >= generationDuration) {
+    timer = 0;
+    evolution.evolveGeneration(balles);
+  }
 }
