@@ -5,7 +5,7 @@ Simulation simple d'evolution
 Balle[] balles;
 Evolution evolution;
 
-int ballCount = 1000;
+int ballCount = 100;
 int bestCount = 10;
 float minAccel = -0.001;
 float maxAccel = 0.001;
