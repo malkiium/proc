@@ -1,7 +1,7 @@
 ArrayList<RectA> rects = new ArrayList();
-int NbRects = 3;
+int NbRects = 1;
 ArrayList<Balle> balles = new ArrayList();
-int NbBalles = 10;
+int NbBalles = 1;
 
 void setup() {
   size(400, 400);
@@ -32,6 +32,14 @@ void draw() {
       if (i != j && balles.get(i).intersecte(balles.get(j))) {
         balles.get(i).changerColor();
         balles.get(j).changerColor();
+      }
+    }
+  }
+  for (int i = 0; i < balles.size(); i++) {
+    for (int j = 0; j < rects.size(); j++) {
+      if (rects.get(j).intersecte(balles.get(i))) {
+        balles.get(i).changerColor();
+        rects.get(j).changerColor();
       }
     }
   }

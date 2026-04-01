@@ -36,6 +36,13 @@ class RectA {
       abs(y - b.y) < (r/2 + b.r/2);
   }
 
+  boolean intersecte(Balle b) {
+    float px = constrain(b.x, x - r/2, x + r/2);
+    float py = constrain(b.y, y - r/2, y + r/2);
+
+    return dist(b.x, b.y, px, py) < b.r;
+  }
+
   void changerColor() {
     coulor = color(random(255), random(255), random(255));
   }
